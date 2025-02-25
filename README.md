@@ -1,7 +1,7 @@
 # RAG Using Pinecone 🚀
 
 ## Overview
-This project implements a **Retrieval-Augmented Generation (RAG) chatbot** using **Pinecone** for vector storage and **OpenAI's GPT-4o** for answering user queries. The chatbot allows both **text and voice input**, utilizing **Streamlit** for the UI and **LangChain** for the conversational retrieval chain.
+This project implements a **Retrieval-Augmented Generation (RAG) chatbot** using **Pinecone** for vector storage and **OpenAI's GPT-4o** for answering user queries. The chatbot allows both **text and voice input**, utilizing **Streamlit** for the UI, **FastAPI** for the backend, and **LangChain** for the conversational retrieval chain.
 
 ## Features
 - **Text & Voice Input:** Users can type or use voice recordings for questions.
@@ -9,6 +9,7 @@ This project implements a **Retrieval-Augmented Generation (RAG) chatbot** using
 - **Pinecone Vector Database:** Stores and retrieves research papers efficiently.
 - **OpenAI GPT-4o Integration:** Provides intelligent answers.
 - **Streamlit UI:** User-friendly interface for interaction.
+- **FastAPI Backend:** Handles API requests efficiently.
 - **Document Processing:** Converts and chunks research documents for indexing.
 
 ## Installation
@@ -18,8 +19,8 @@ Ensure you have Python installed (>=3.8).
 ### Setup
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Osama-Abo-Bakr/RAG-Using-Pinecone
-   cd RAG-Using-Pinecone
+   git clone <repository_url>
+   cd <repository_directory>
    ```
 2. Create a virtual environment (recommended):
    ```bash
@@ -38,8 +39,15 @@ Ensure you have Python installed (>=3.8).
    - Fill in the required API keys (PINECONE, OpenAI, etc.).
 
 ## Usage
-### Running the Application
-Start the Streamlit app with:
+### Running the Backend
+Start the FastAPI server:
+```bash
+uvicorn server:app --reload
+```
+This starts the API, which can be accessed at `http://localhost:8000`.
+
+### Running the Frontend
+Start the Streamlit app:
 ```bash
 streamlit run main.py
 ```
@@ -59,6 +67,7 @@ create_vector_store("path_to_documents", "rag-pinecone")
 ├── .env.example             # Example environment variables
 ├── requirements.txt         # Dependencies
 ├── main.py                  # Streamlit app entry point
+├── server.py                # FastAPI backend
 ├── utils.py                 # Utility functions (vector database, document processing, transcription)
 └── README.md                # Project documentation
 ```
@@ -66,18 +75,24 @@ create_vector_store("path_to_documents", "rag-pinecone")
 ## Key Components
 ### `main.py`
 - Loads the **Pinecone Vector Store**.
-- Creates a **Conversational Retrieval Chain**.
+- Sends queries to the FastAPI backend.
 - Handles **text and voice inputs**.
 - Displays **chat history and references**.
+
+### `server.py`
+- FastAPI backend to handle requests.
+- Routes for **text and voice queries**.
+- Stores **chat history** in memory.
 
 ### `utils.py`
 - **Transcribes audio** using **Groq's Whisper model**.
 - **Processes documents** and creates Pinecone vector stores.
 - **Manages Pinecone indexes**.
+- **Handles API communication** with the chatbot.
 
 ### `requirements.txt`
 Contains necessary dependencies such as:
-- `streamlit`, `fastapi`, `pinecone`, `langchain`, `groq`, `openai`, `dotenv`.
+- `streamlit`, `fastapi`, `uvicorn`, `pinecone`, `langchain`, `groq`, `openai`, `dotenv`.
 
 ## Environment Variables
 Set up the `.env` file with:

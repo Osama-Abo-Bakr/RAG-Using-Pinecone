@@ -1,11 +1,13 @@
 import os
-from dotenv import load_dotenv
 from groq import Groq
+from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
 from langchain_pinecone import PineconeVectorStore
-from langchain_openai import OpenAIEmbeddings
 from docling.document_converter import DocumentConverter
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain.chains import ConversationalRetrievalChain
+from langchain_core.prompts import PromptTemplate
 
 
 load_dotenv()
@@ -101,6 +103,64 @@ def create_vector_store(data_paths, index_name):
     vector_store = PineconeVectorStore.from_texts(data, embedding, index_name=index_name)
     print("✅ Finish create Vector-Database (Pinecone)")
     return vector_store
+
+
+def create_retriever_chain(vectorstore):
+    """
+    Loads a conversational retrieval chain from a vectorstore.
+
+    Given a vectorstore, loads a conversational retrieval chain using the following steps:
+
+    1. Loads a retriever from the vectorstore using FAISS.
+    2. Loads an LLM from the OpenAI API.
+    3. Creates a PromptTemplate using a template string.
+    4. Creates a ConversationalRetrievalChain from the retriever and LLM.
+
+    Args:
+        vectorstore (FAISS): The vector store containing the document embeddings.
+
+    Returns:
+        ConversationalRetrievalChain: The conversational retrieval chain.
+    """
+    retriever = vectorstore.as_retriever(search_type="mmr", search_kwargs={"k": 5})
+    llm = ChatOpenAI(model="gpt-4o", temperature=0.3)
+
+    template = """
+    You are an AI research assistant specializing in research_field.  
+    Your task is to answer questions about the research papers.  
+
+    Use the following context from the paper to provide an accurate response in markdown format (highly structured):  
+    {context}  
+
+    Question: {question}  
+
+    Answer the question strictly based on the provided context. If the context is insufficient, state that more information is needed.
+    """
+
+    prompt = PromptTemplate(
+        input_variables=["context", "question"], 
+        template=template
+    )
+
+    return ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=retriever,
+        return_source_documents=True,
+        combine_docs_chain_kwargs={"prompt": prompt, "document_variable_name": "context"},
+    )
+
+def get_response(user_query, chat_history):
+    index_name = 'rag-pinecone'
+    vector_db = PineconeVectorStore(embedding=OpenAIEmbeddings(), index_name=index_name)
+    load_qa_chain = create_retriever_chain(vectorstore=vector_db)
+    result = load_qa_chain.invoke(
+                {
+                    "question": user_query,
+                    "chat_history": chat_history,
+                }
+            )
+    
+    return result
         
 
 def transcribe_audio(audio_bytes):

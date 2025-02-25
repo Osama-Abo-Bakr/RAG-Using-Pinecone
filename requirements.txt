@@ -1,0 +1,16 @@
+streamlit
+fastapi
+uvicorn
+python-dotenv
+python-multipart
+langchain
+langchain_community
+langchain_experimental
+langchain_pinecone
+langchain_ollama
+langchain_core
+langchain_openai
+pinecone
+docling
+groq
+streamlit-mic-recorder

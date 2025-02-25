@@ -18,8 +18,8 @@ Ensure you have Python installed (>=3.8).
 ### Setup
 1. Clone the repository:
    ```bash
-   git clone <repository_url>
-   cd <repository_directory>
+   git clone https://github.com/Osama-Abo-Bakr/RAG-Using-Pinecone
+   cd RAG-Using-Pinecone
    ```
 2. Create a virtual environment (recommended):
    ```bash

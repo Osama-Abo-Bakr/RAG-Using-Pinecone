@@ -2,3 +2,4 @@
 test.py
 data/*
 rag-pinecone/*
+Dockerfile
